@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HavenOS - Smart Housing Society & Gated Community Management</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- FULL SCREEN STRICT AUTHENTICATION LOGIN OVERLAY -->
+  <div class="login-overlay active" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <h2 class="login-title">Grand View Heights</h2>
+        <p class="login-subtitle">Secure Gated Community Portal Sign In</p>
+      </div>
+
+      <div class="login-split">
+        <!-- Account Credentials Sign In Form -->
+        <div>
+          <h3 style="font-size: 1rem; margin-bottom: 16px;"><i class="fa-solid fa-lock"></i> Account Sign In</h3>
+          <form id="loginAuthForm">
+            <div class="form-group">
+              <label class="form-label">Email / User ID</label>
+              <input type="email" class="form-control" id="loginEmail" placeholder="e.g. admin@haven.com" required value="admin@haven.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required value="admin123">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Role Portal</label>
+              <select class="form-control" id="loginRoleSelect">
+                <option value="admin">Admin / Society Committee</option>
+                <option value="owner">Flat Owner (A-402)</option>
+                <option value="tenant">Flat Tenant (B-203)</option>
+                <option value="security">Security Guard (Main Gate)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+              <i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal
+            </button>
+          </form>
+        </div>
+
+        <!-- Demo Account Credentials Helper -->
+        <div>
+          <h3 style="font-size: 1rem; margin-bottom: 16px;"><i class="fa-solid fa-key"></i> System User Credentials</h3>
+          <div class="demo-credentials-box">
+
+            <div class="demo-card" onclick="fillCredentials('admin@haven.com', 'admin123', 'admin')">
+              <div>
+                <span class="demo-role-badge" style="color:var(--role-admin);"><i class="fa-solid fa-user-shield"></i> Admin Account</span>
+                <span class="demo-cred-text">admin@haven.com | admin123</span>
+              </div>
+              <button class="btn btn-sm btn-primary">Fill Login</button>
+            </div>
+
+            <div class="demo-card" onclick="fillCredentials('owner@haven.com', 'owner123', 'owner')">
+              <div>
+                <span class="demo-role-badge" style="color:var(--role-owner);"><i class="fa-solid fa-house-user"></i> Owner Account</span>
+                <span class="demo-cred-text">owner@haven.com | owner123</span>
+              </div>
+              <button class="btn btn-sm btn-success">Fill Login</button>
+            </div>
+
+            <div class="demo-card" onclick="fillCredentials('tenant@haven.com', 'tenant123', 'tenant')">
+              <div>
+                <span class="demo-role-badge" style="color:var(--role-tenant);"><i class="fa-solid fa-key"></i> Tenant Account</span>
+                <span class="demo-cred-text">tenant@haven.com | tenant123</span>
+              </div>
+              <button class="btn btn-sm btn-warning" style="background:var(--role-tenant); color:#fff;">Fill Login</button>
+            </div>
+
+            <div class="demo-card" onclick="fillCredentials('security@haven.com', 'sec123', 'security')">
+              <div>
+                <span class="demo-role-badge" style="color:var(--role-security);"><i class="fa-solid fa-shield-halved"></i> Security Guard</span>
+                <span class="demo-cred-text">security@haven.com | sec123</span>
+              </div>
+              <button class="btn btn-sm btn-danger">Fill Login</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- Main Header -->
+    <header class="main-header">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Grand View Heights</h1>
+          <span>Gated Community Management Portal</span>
+        </div>
+      </div>
+
+      <div class="header-user-profile">
+        <button class="theme-toggle-btn" id="themeToggleBtn" style="margin-right: 8px;">
+          <i class="fa-solid fa-sun" id="themeIcon"></i> <span id="themeText">Light</span>
+        </button>
+
+        <button class="sos-trigger-btn" id="headerSosBtn">
+          <i class="fa-solid fa-triangle-exclamation"></i> Emergency SOS
+        </button>
+
+        <div class="user-avatar-badge" id="userProfileDisplay">
+          <div class="avatar-img" id="userAvatarText">AD</div>
+          <div class="user-meta">
+            <span class="user-name" id="userNameText">Society Administrator</span>
+            <span class="user-role-tag" id="userRoleTag">Management Committee</span>
+          </div>
+        </div>
+
+        <button class="logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Body Layout -->
+    <div class="main-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="nav-section-title">Main Menu</div>
+        <nav id="sidebarNav">
+          <!-- Dynamically populated by JS based on Logged In Role -->
+        </nav>
+      </aside>
+
+      <!-- Main Dynamic Content Container -->
+      <main class="content-area" id="contentArea">
+        <!-- Rendered view content goes here -->
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALS CONTAINER -->
+
+  <!-- ADMIN ADD USER MODAL (Owners, Security, Admins) -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-user-plus"></i> Add New User / Personnel</h3>
+        <button class="modal-close-btn" data-close-modal="addUserModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm">
+          <div class="form-group">
+            <label class="form-label">User Type / Role</label>
+            <select class="form-control" id="newUserRoleSelect" onchange="toggleAddUserFields(this.value)">
+              <option value="owner">Flat Owner</option>
+              <option value="security">Security Guard</option>
+              <option value="admin">Society Admin Person</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="newUserName" placeholder="e.g. Ramesh Patel" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email ID (Login Username)</label>
+            <input type="email" class="form-control" id="newUserEmail" placeholder="e.g. rPatel@haven.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="newUserPassword" placeholder="••••••••" required>
+          </div>
+          <div class="form-group" id="flatSelectGroup">
+            <label class="form-label">Assigned Flat Number</label>
+            <input type="text" class="form-control" id="newUserFlat" placeholder="e.g. C-302">
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="addUserModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-check"></i> Save User & Enable Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWNER ADD TENANT MODAL -->
+  <div class="modal-overlay" id="addTenantModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-key"></i> Add New Tenant to Flat</h3>
+        <button class="modal-close-btn" data-close-modal="addTenantModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="addTenantForm">
+          <div class="form-group">
+            <label class="form-label">Tenant Full Name</label>
+            <input type="text" class="form-control" id="tenantName" placeholder="e.g. Neha Gupta" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tenant Email (Login Username)</label>
+            <input type="email" class="form-control" id="tenantEmail" placeholder="e.g. neha@haven.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Login Password</label>
+            <input type="password" class="form-control" id="tenantPassword" placeholder="••••••••" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Phone Number</label>
+            <input type="tel" class="form-control" id="tenantPhone" placeholder="+91 98765 88888" required>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="addTenantModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-key"></i> Register Tenant</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. Pre-Approve Visitor Modal (Resident View) -->
+  <div class="modal-overlay" id="preApproveVisitorModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-user-plus"></i> Pre-Approve Visitor Pass</h3>
+        <button class="modal-close-btn" data-close-modal="preApproveVisitorModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="preApproveForm">
+          <div class="form-group">
+            <label class="form-label">Visitor Full Name</label>
+            <input type="text" class="form-control" id="visitorName" placeholder="e.g. Rahul Sharma" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Visitor Phone Number</label>
+            <input type="tel" class="form-control" id="visitorPhone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Visitor Type</label>
+            <select class="form-control" id="visitorType">
+              <option value="Guest">Guest / Friend</option>
+              <option value="Delivery">Delivery (Zomato/Amazon/Swiggy)</option>
+              <option value="Cab">Cab Driver (Uber/Ola)</option>
+              <option value="Service">Service Technician / Handyman</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expected Date & Time</label>
+            <input type="datetime-local" class="form-control" id="visitorTime" required>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="preApproveVisitorModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-qrcode"></i> Generate 6-Digit Gate PIN</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Security Manual Entry Modal -->
+  <div class="modal-overlay" id="securityEntryModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-person-shelter"></i> Security Manual Gate Check-in</h3>
+        <button class="modal-close-btn" data-close-modal="securityEntryModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="manualEntryForm">
+          <div class="form-group">
+            <label class="form-label">Visitor Name</label>
+            <input type="text" class="form-control" id="secVisitorName" required placeholder="Enter visitor name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Destination Flat Number</label>
+            <select class="form-control" id="secFlatSelect" required>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-control" id="secCategory">
+              <option value="Guest">Guest</option>
+              <option value="Delivery">Delivery Agent</option>
+              <option value="Service Worker">Service / Maintenance Worker</option>
+              <option value="Cab Driver">Cab</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vehicle Number (Optional)</label>
+            <input type="text" class="form-control" id="secVehicleNo" placeholder="e.g. MH-12-AB-1234">
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="securityEntryModal">Cancel</button>
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-door-open"></i> Approve Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Pay Maintenance Bill Modal -->
+  <div class="modal-overlay" id="payBillModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-credit-card"></i> Pay Maintenance Dues</h3>
+        <button class="modal-close-btn" data-close-modal="payBillModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="background: rgba(79, 70, 229, 0.1); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+            <span>Bill Amount:</span>
+            <strong id="billAmountText" style="font-size: 1.2rem; color: var(--primary);">₹4,500.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+            <span>Billing Period:</span>
+            <span id="billPeriodText">July 2026</span>
+          </div>
+        </div>
+
+        <form id="payBillForm">
+          <input type="hidden" id="payBillId">
+          <div class="form-group">
+            <label class="form-label">Select Payment Method</label>
+            <select class="form-control" id="paymentMethodSelect">
+              <option value="UPI">UPI / QR Code Scan (Instant)</option>
+              <option value="Card">Credit / Debit Card</option>
+              <option value="NetBanking">Internet Banking</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Card / UPI ID Reference</label>
+            <input type="text" class="form-control" id="payReferenceInput" placeholder="e.g. user@okicici or 4532 **** **** 9012" required>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="payBillModal">Cancel</button>
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-lock"></i> Process Payment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Printable Receipt Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-file-invoice"></i> Payment Receipt</h3>
+        <button class="modal-close-btn" data-close-modal="receiptModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="receiptContent">
+        <!-- Rendered via JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="receiptModal">Close</button>
+        <button class="btn btn-primary" id="printReceiptBtn"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. File Complaint Modal -->
+  <div class="modal-overlay" id="fileComplaintModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-screwdriver-wrench"></i> Raise Service Ticket</h3>
+        <button class="modal-close-btn" data-close-modal="fileComplaintModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="complaintForm">
+          <div class="form-group">
+            <label class="form-label">Issue Category</label>
+            <select class="form-control" id="complaintCategory">
+              <option value="Plumbing">Plumbing / Leakage</option>
+              <option value="Electrical">Electrical / Lighting</option>
+              <option value="Elevator">Elevator Maintenance</option>
+              <option value="Security">Security / Gate Issue</option>
+              <option value="Cleanliness">Garbage / Cleanliness</option>
+              <option value="Noise">Noise Disturbance</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject Title</label>
+            <input type="text" class="form-control" id="complaintTitle" placeholder="Brief summary of the issue" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Detailed Description</label>
+            <textarea class="form-control" id="complaintDesc" placeholder="Explain the problem in detail..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Urgency Level</label>
+            <select class="form-control" id="complaintUrgency">
+              <option value="Normal">Normal</option>
+              <option value="High">High</option>
+              <option value="Urgent">Emergency / Urgent</option>
+            </select>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="fileComplaintModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Ticket</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Book Amenity Modal -->
+  <div class="modal-overlay" id="bookAmenityModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-calendar-check"></i> Book Society Facility</h3>
+        <button class="modal-close-btn" data-close-modal="bookAmenityModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="amenityForm">
+          <div class="form-group">
+            <label class="form-label">Facility</label>
+            <select class="form-control" id="amenitySelect">
+              <option value="Clubhouse Hall">Clubhouse Party Hall</option>
+              <option value="Tennis Court">Tennis Court</option>
+              <option value="Swimming Pool">Swimming Pool VIP Lane</option>
+              <option value="Badminton Court">Badminton Court A</option>
+              <option value="Community Gym">Gym Private Session</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="amenityDate" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Select Time Slot</label>
+            <div class="slot-grid" id="slotGrid">
+              <div class="slot-item" data-slot="07:00 - 08:00 AM">07-08 AM</div>
+              <div class="slot-item" data-slot="08:00 - 09:00 AM">08-09 AM</div>
+              <div class="slot-item" data-slot="10:00 - 12:00 PM">10-12 PM</div>
+              <div class="slot-item" data-slot="04:00 - 06:00 PM">04-06 PM</div>
+              <div class="slot-item" data-slot="06:00 - 08:00 PM">06-08 PM</div>
+              <div class="slot-item" data-slot="08:00 - 10:00 PM">08-10 PM</div>
+            </div>
+            <input type="hidden" id="selectedSlotValue" required>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="bookAmenityModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Confirm Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Admin Publish Notice Modal -->
+  <div class="modal-overlay" id="publishNoticeModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-bullhorn"></i> Broadcast Society Notice</h3>
+        <button class="modal-close-btn" data-close-modal="publishNoticeModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="noticeForm">
+          <div class="form-group">
+            <label class="form-label">Notice Title</label>
+            <input type="text" class="form-control" id="noticeTitle" placeholder="e.g. Annual General Body Meeting" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-control" id="noticeCategory">
+              <option value="General">General</option>
+              <option value="Maintenance">Maintenance Schedule</option>
+              <option value="Event">Community Event</option>
+              <option value="Urgent">Urgent Warning</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Content</label>
+            <textarea class="form-control" id="noticeContent" placeholder="Enter notice announcement body..." required></textarea>
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="publishNoticeModal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-share-nodes"></i> Publish Notice</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Emergency SOS Alert Trigger Modal -->
+  <div class="modal-overlay" id="sosModal">
+    <div class="modal-container" style="border: 2px solid var(--danger);">
+      <div class="modal-header" style="background: rgba(239, 68, 68, 0.1);">
+        <h3 class="modal-title" style="color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Panic Alert</h3>
+        <button class="modal-close-btn" data-close-modal="sosModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; font-weight: 600;">Sending an Emergency SOS will immediately broadcast an urgent visual warning to Security Guards & Society Admins with your Flat location.</p>
+        <form id="sosForm">
+          <div class="form-group">
+            <label class="form-label">Emergency Type</label>
+            <select class="form-control" id="sosCategory">
+              <option value="Medical Emergency">Medical Emergency</option>
+              <option value="Fire Hazard">Fire Hazard</option>
+              <option value="Intruder / Security Threat">Intruder / Security Threat</option>
+              <option value="Lift Trap">Trapped in Elevator</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Flat / Block Number</label>
+            <input type="text" class="form-control" id="sosFlat" value="A-402 (Flat 402)" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Note / Special Instruction (Optional)</label>
+            <input type="text" class="form-control" id="sosNote" placeholder="e.g. Elderly person inside flat">
+          </div>
+          <div class="modal-footer" style="padding: 16px 0 0 0; border: none;">
+            <button type="button" class="btn btn-secondary" data-close-modal="sosModal">Cancel</button>
+            <button type="submit" class="btn btn-danger" style="font-size: 1rem;"><i class="fa-solid fa-bell"></i> BROADCAST EMERGENCY NOW</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main JavaScript App -->
+  <script src="app.js"></script>
+  <script>
+    function fillCredentials(email, password, role) {
+      document.getElementById('loginEmail').value = email;
+      document.getElementById('loginPassword').value = password;
+      document.getElementById('loginRoleSelect').value = role;
+    }
+
+    function toggleAddUserFields(role) {
+      const group = document.getElementById('flatSelectGroup');
+      if (role === 'owner' || role === 'tenant') {
+        group.style.display = 'block';
+      } else {
+        group.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
